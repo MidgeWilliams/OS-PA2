@@ -23,9 +23,9 @@ import cs131.pa2.Abstract.Log.Log;
 public class SimulationTest {
 
     public static boolean DEBUG_MODE = true;
-    private static final int wave1Cars = 10;
-    private static final int wave2Sleds= 10;
-    private static final int wave3Cars = 10;    
+    private static final int wave1Cars = 50;
+    private static final int wave2Sleds= 50;
+    private static final int wave3Cars = 50;    
     
     
     @Before

@@ -20,12 +20,10 @@ public class BasicTunnel extends Tunnel{
 	private final String CAR = "CAR";
 	private final String SLED = "SLED";
 	
-	private boolean sledWaiting; //Boolean to check if there's a sled in the queue
 	private String currVehicle; //Keeps track of if cars or sleds are inside
 	private Direction currDir;  //Keeps track of direction
 	
 	private LinkedList<Vehicle> inTunnel; //Vehicles in the tunnel currently
-	private LinkedList<Vehicle> waiting; //Vehicles waiting to get into the tunnel
 	
 	/**
 	 * Basic initializing of variables
@@ -35,10 +33,8 @@ public class BasicTunnel extends Tunnel{
 
 		currDir = null;
 		currVehicle = null;
-		sledWaiting = false;
 		
 		inTunnel = new LinkedList<>();
-		waiting = new LinkedList<>();
 	}
 
 	@Override
@@ -48,40 +44,30 @@ public class BasicTunnel extends Tunnel{
 			if(vehicle instanceof Sled) {
 				
 				if(inTunnel.size() == 0) { //Tunnel has to be empty for sled to enter
-					inTunnel.add(vehicle);
-					
-					offWait(vehicle);
-					
+					inTunnel.add(vehicle);		
 					currDir = vehicle.getDirection();
 					currVehicle = SLED;
 					notify(); //Not sure this needs to be here but feels right, same goes for the rest of the notifies
 					return true;
 					
-				//IF it didn't get in
-				}else {
-					waiting.addFirst(vehicle); //Adds first for checks later
-					sledWaiting = true;
 				}
+				
 			//CAR
 			}else if(vehicle instanceof Car) {
 				
-				//TUNNEL IS EMPTY AND NO SLEDS WAITING
-				if(!sledWaiting && inTunnel.size() == 0){
+				//TUNNEL IS EMPTY 
+				if(inTunnel.size() == 0){
 					inTunnel.add(vehicle);
-					offWait(vehicle);
 					currDir = vehicle.getDirection();
 					currVehicle = CAR;
 					notify();
 					return true;
 					
-				//TUNNEL HAS LESS THAN 3 CARS IN IT AND NO SLEDS WAITING
-				}else if(!sledWaiting && currVehicle.equals(CAR) && inTunnel.size() < 3) {
+				//TUNNEL HAS LESS THAN 3 CARS IN IT 
+				}else if(currVehicle.equals(CAR) && inTunnel.size() < 3) {
 					inTunnel.add(vehicle);
-					offWait(vehicle);
 					notify();
 					return true;
-				}else {
-					waiting.addLast(vehicle);
 				}
 				
 			}
@@ -89,28 +75,8 @@ public class BasicTunnel extends Tunnel{
 		notify();
 		return false;
 	}
-
-	/**
-	 * Takes the given vehicle off of the wait list if it was on it 
-	 * @param vehicle
-	 * @return True if it was taken off, False if it wasn't (if it got in without waiting)
-	 */
-	public boolean offWait(Vehicle vehicle) {
-		if(waiting.contains(vehicle)) {
-			waiting.remove(vehicle);
-			if(vehicle instanceof Sled) {
-				if(waiting.size() == 0 || !(waiting.getFirst() instanceof Sled)) { 
-					/*Checks to see if there is a sled waiting behind the one that just got in 
-					 *(always puts sleds at front of list so it will be easy to see if it's there)
-					*/
-					sledWaiting = false;
-				}
-			}
-			return true;
-		}
-		return false;
-	}
 	
+		
 	@Override
 	public synchronized void exitTunnelInner(Vehicle vehicle) {
 		//Always checks to make sure the vehicle was in the tunnel before trying to remove it just to be safe
