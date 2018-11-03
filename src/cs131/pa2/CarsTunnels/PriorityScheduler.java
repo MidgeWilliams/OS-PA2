@@ -31,7 +31,35 @@ public class PriorityScheduler extends Tunnel{
 	
 	@Override
 	public boolean tryToEnterInner(Vehicle vehicle) {
+		while(true) {
+			int currPr = vehicle.getPriority();
+			if(!priority.get(currPr).contains(vehicle)) {
+				priority.get(currPr).add(vehicle);
+			}
+			if(checkHighPrior(currPr) || checkTunnels(vehicle)) {
+				
+			}
+			
+			return false;
+		}
+		
+	}
+	
+	private boolean checkTunnels(Vehicle vehicle) {
+		
+		for(Tunnel tunnel:tunnels) {
+			tunnel.tryToEnter(vehicle);
+		}
 		return false;
+	}
+	
+	private boolean checkHighPrior(int curr) {
+		for(int i = 4; i >= 0; i++) {
+			if(!priority.get(i).isEmpty()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
